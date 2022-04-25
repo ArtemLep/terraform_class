@@ -31,11 +31,9 @@ resource "aws_iam_user" "name1" {
  name= element (var.user_names, count.index)
 }
 
-output "list_length" {
-  value = length(var.user_names)
+output "users" {
+  value = aws_iam_user.name1[*].name
 }
-*/
-
 
 resource "aws_default_vpc" "name" {
   tags = {
@@ -80,9 +78,6 @@ resource "aws_security_group" "allow_tls" {
       cidr_blocks = ingress.value.cidr_blocks
     }
   }
-
-
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -94,3 +89,35 @@ resource "aws_security_group" "allow_tls" {
     Name = "allow_tls"
   }
 }
+
+
+variable "tags" {
+  type = map(any)
+  default = {
+    "Name"     = "Database-Server"
+    "ENV"      = "PROD"
+    "PATCHING" = "Linux"
+    "Owner"    = "Amazon"
+   
+  }
+}
+
+output "merge_tags" {
+  value = merge("${var.tags}", { DEPARTMENT = "Finance" },{ CreatBy  = "Terraform"})
+}
+
+
+output "look_up" {
+  value = lookup(var.tags, "Department", "Finance")
+}
+data "aws_caller_identity" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
+
+resource "aws_s3_bucket" "test_bucket" {
+  bucket = "app-bucket-${local.account_id}"
+}*/
+

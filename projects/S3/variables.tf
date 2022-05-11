@@ -3,3 +3,4 @@ variable "bucket_name" {
   description = "S3 bucket name for static web hosting"
   default     = "fall-web-project-artem"
 }
+
